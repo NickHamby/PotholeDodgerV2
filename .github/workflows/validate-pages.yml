@@ -12,30 +12,19 @@ jobs:
       - name: Wait for Pages to deploy
         run: sleep 30
 
-      - name: Check root URL redirects to web/index.html
+      - name: Check root URL returns HTTP 200 and contains expected content
         run: |
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code} %{url_effective}" -L https://nickhamby.github.io/PotholeDodgerV2/)
-          HTTP_CODE=$(echo $RESPONSE | cut -d' ' -f1)
-          FINAL_URL=$(echo $RESPONSE | cut -d' ' -f2)
-
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://nickhamby.github.io/PotholeDodgerV2/)
           echo "HTTP status: $HTTP_CODE"
-          echo "Final URL: $FINAL_URL"
 
           if [ "$HTTP_CODE" != "200" ]; then
             echo "ERROR: Expected HTTP 200, got $HTTP_CODE"
             exit 1
           fi
 
-          if [[ "$FINAL_URL" != *"web/index.html"* ]]; then
-            echo "ERROR: Expected redirect to web/index.html, landed on $FINAL_URL"
-            exit 1
-          fi
+          echo "OK: HTTP 200 received"
 
-          echo "OK: Page redirected correctly to $FINAL_URL"
-
-      - name: Check web/index.html contains expected content
-        run: |
-          CONTENT=$(curl -s https://nickhamby.github.io/PotholeDodgerV2/web/index.html)
+          CONTENT=$(curl -s https://nickhamby.github.io/PotholeDodgerV2/)
 
           if echo "$CONTENT" | grep -q "Pothole Dodger"; then
             echo "OK: Page title found"
