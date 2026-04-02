@@ -1,0 +1,38 @@
+name: Run RVA 311 Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/rva311_pipeline.py'
+      - '.github/workflows/run-pipeline.yml'
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests==2.33.1
+
+      - name: Run pipeline
+        run: python scripts/rva311_pipeline.py
+
+      - name: Commit hazards.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add web/data/hazards.json
+          git diff --cached --quiet || git commit -m "chore: update hazards.json from RVA 311 pipeline"
+          git push
