@@ -1,0 +1,75 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: sans-serif;
+  background: #1a1a1a;
+  color: #f0f0f0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+header {
+  padding: 12px 16px;
+  background: #111;
+  border-bottom: 1px solid #333;
+}
+
+header h1 {
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+}
+
+#controls {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #111;
+  border-bottom: 1px solid #333;
+}
+
+#controls input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #222;
+  color: #f0f0f0;
+  font-size: 0.95rem;
+}
+
+#controls button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 4px;
+  background: #e63946;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+#controls button:hover {
+  background: #c1121f;
+}
+
+#status {
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  color: #aaa;
+  min-height: 28px;
+  background: #111;
+}
+
+#map {
+  flex: 1;
+}
