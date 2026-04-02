@@ -1,10 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url=web/index.html" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pothole Dodger</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="web/css/theme.css" />
 </head>
 <body>
-  <a href="web/index.html">Click here if not redirected</a>
+  <div id="app">
+    <header>
+      <h1>Pothole Dodger</h1>
+    </header>
+
+    <div id="controls">
+      <input type="text" id="origin" placeholder="Starting address" />
+      <input type="text" id="destination" placeholder="Destination address" />
+      <button id="go-btn">Go</button>
+    </div>
+
+    <div id="status"></div>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="web/js/geocode.js"></script>
+  <script src="web/js/routing.js"></script>
+  <script src="web/js/hazards.js"></script>
+  <script src="web/js/map.js"></script>
+  <script src="web/js/app.js"></script>
 </body>
 </html>
