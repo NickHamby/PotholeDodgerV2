@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'copilot/run-hazards-script-and-commit-output'
+      - main
     paths:
       - 'scripts/rva311_pipeline.py'
       - '.github/workflows/run-pipeline.yml'
@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests==2.33.1
 
       - name: Run pipeline
         run: python scripts/rva311_pipeline.py
