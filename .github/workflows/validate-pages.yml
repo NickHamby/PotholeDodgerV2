@@ -1,0 +1,61 @@
+name: Validate GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Pages to deploy
+        run: sleep 30
+
+      - name: Check root URL redirects to web/index.html
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code} %{url_effective}" -L https://nickhamby.github.io/PotholeDodgerV2/)
+          HTTP_CODE=$(echo $RESPONSE | cut -d' ' -f1)
+          FINAL_URL=$(echo $RESPONSE | cut -d' ' -f2)
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Final URL: $FINAL_URL"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "ERROR: Expected HTTP 200, got $HTTP_CODE"
+            exit 1
+          fi
+
+          if [[ "$FINAL_URL" != *"web/index.html"* ]]; then
+            echo "ERROR: Expected redirect to web/index.html, landed on $FINAL_URL"
+            exit 1
+          fi
+
+          echo "OK: Page redirected correctly to $FINAL_URL"
+
+      - name: Check web/index.html contains expected content
+        run: |
+          CONTENT=$(curl -s https://nickhamby.github.io/PotholeDodgerV2/web/index.html)
+
+          if echo "$CONTENT" | grep -q "Pothole Dodger"; then
+            echo "OK: Page title found"
+          else
+            echo "ERROR: 'Pothole Dodger' not found in page content"
+            echo "--- Page content ---"
+            echo "$CONTENT"
+            exit 1
+          fi
+
+          if echo "$CONTENT" | grep -q "go-btn"; then
+            echo "OK: Go button found"
+          else
+            echo "ERROR: Go button not found in page content"
+            exit 1
+          fi
+
+          if echo "$CONTENT" | grep -q "origin"; then
+            echo "OK: Origin input found"
+          else
+            echo "ERROR: Origin input not found in page content"
+            exit 1
+          fi
