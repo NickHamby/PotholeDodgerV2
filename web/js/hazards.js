@@ -42,11 +42,13 @@ async function getHazardsOnRoute(streetSegments) {
     maxNum: seg.maxNum
   }));
 
+  console.log('[hazards] normalized route street segments:', normalizedSegments);
+
   return hazards.filter(hazard => {
     const houseNumMatch = hazard.location.match(/^(\d+)/);
     const hazardNum = houseNumMatch ? parseInt(houseNumMatch[1], 10) : null;
     const tokens = hazard.location.split('&').map(normalizeStreet);
-    return tokens.some(token =>
+    const matched = tokens.some(token =>
       normalizedSegments.some(seg => {
         const nameMatch = seg.name.includes(token) || token.includes(seg.name);
         if (!nameMatch) return false;
@@ -54,5 +56,7 @@ async function getHazardsOnRoute(streetSegments) {
         return hazardNum >= seg.minNum - HOUSE_NUMBER_BUFFER && hazardNum <= seg.maxNum + HOUSE_NUMBER_BUFFER;
       })
     );
+    console.log(`[hazards] "${hazard.location}" → tokens: ${JSON.stringify(tokens)} → ${matched ? 'INCLUDED' : 'excluded'}`);
+    return matched;
   });
 }
