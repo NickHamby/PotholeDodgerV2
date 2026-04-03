@@ -71,5 +71,6 @@ async function getRoute(origin, destination) {
     streetSegments.push({ name, minNum, maxNum });
   }
 
+  console.log('[routing] street segments on route:', streetSegments);
   return { polyline, streetSegments };
 }
