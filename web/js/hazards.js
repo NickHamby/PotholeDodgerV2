@@ -15,6 +15,8 @@ const ABBR_MAP = [
   [/\bS\b/g, 'South'],
 ];
 
+const HOUSE_NUMBER_BUFFER = 100;
+
 function normalizeStreet(str) {
   let s = str;
   for (const [pattern, replacement] of ABBR_MAP) {
@@ -27,21 +29,30 @@ function normalizeStreet(str) {
   return s.trim().toLowerCase();
 }
 
-async function getHazardsOnRoute(streetNames) {
+async function getHazardsOnRoute(streetSegments) {
   const response = await fetch('web/data/hazards.json');
   if (!response.ok) {
     throw new Error(`Failed to load hazards: ${response.status} ${response.statusText}`);
   }
   const hazards = await response.json();
 
-  const normalizedRouteNames = streetNames.map(normalizeStreet);
+  const normalizedSegments = streetSegments.map(seg => ({
+    name: normalizeStreet(seg.name),
+    minNum: seg.minNum,
+    maxNum: seg.maxNum
+  }));
 
   return hazards.filter(hazard => {
+    const houseNumMatch = hazard.location.match(/^(\d+)/);
+    const hazardNum = houseNumMatch ? parseInt(houseNumMatch[1], 10) : null;
     const tokens = hazard.location.split('&').map(normalizeStreet);
     return tokens.some(token =>
-      normalizedRouteNames.some(
-        routeName => routeName.includes(token) || token.includes(routeName)
-      )
+      normalizedSegments.some(seg => {
+        const nameMatch = seg.name.includes(token) || token.includes(seg.name);
+        if (!nameMatch) return false;
+        if (hazardNum === null) return true;
+        return hazardNum >= seg.minNum - HOUSE_NUMBER_BUFFER && hazardNum <= seg.maxNum + HOUSE_NUMBER_BUFFER;
+      })
     );
   });
 }
