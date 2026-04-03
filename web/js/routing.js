@@ -1,6 +1,6 @@
 // routing.js — fetches a driving route between two {lat, lng} points using OSRM
 
-export async function getRoute(origin, destination) {
+async function getRoute(origin, destination) {
   const url = `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&steps=true`;
   const response = await fetch(url);
   if (!response.ok) {

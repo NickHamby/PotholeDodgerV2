@@ -15,7 +15,7 @@ const ABBR_MAP = [
   [/\bS\b/g, 'South'],
 ];
 
-export function normalizeStreet(str) {
+function normalizeStreet(str) {
   let s = str;
   for (const [pattern, replacement] of ABBR_MAP) {
     s = s.replace(pattern, replacement);
@@ -27,7 +27,7 @@ export function normalizeStreet(str) {
   return s.trim().toLowerCase();
 }
 
-export async function getHazardsOnRoute(streetNames) {
+async function getHazardsOnRoute(streetNames) {
   const response = await fetch('web/data/hazards.json');
   if (!response.ok) {
     throw new Error(`Failed to load hazards: ${response.status} ${response.statusText}`);

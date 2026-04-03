@@ -11,7 +11,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 let routeLayer = null;
 let hazardMarkers = [];
 
-export function drawRoute(polyline) {
+function drawRoute(polyline) {
   if (routeLayer) {
     map.removeLayer(routeLayer);
     routeLayer = null;
@@ -26,7 +26,7 @@ export function drawRoute(polyline) {
   map.fitBounds(routeLayer.getBounds());
 }
 
-export function plotHazards(hazards) {
+function plotHazards(hazards) {
   for (const marker of hazardMarkers) {
     map.removeLayer(marker);
   }

@@ -1,5 +1,9 @@
 function attachAutocomplete(inputEl) {
   const list = inputEl.parentElement.querySelector('.autocomplete-list');
+  if (!list) {
+    console.warn('attachAutocomplete: no .autocomplete-list found for', inputEl.id);
+    return;
+  }
   let debounceTimer = null;
 
   function hideList() {
