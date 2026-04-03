@@ -1,7 +1,7 @@
 // geocode.js — resolves an address string to {lat, lng} using Nominatim
 
 async function geocodeAddress(address) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&bounded=1&viewbox=-77.6,37.7,-77.2,37.4&countrycodes=us&q=${encodeURIComponent(address)}`;
   const response = await fetch(url, {
     headers: {
       'User-Agent': 'PotholeDodger/1.0'
