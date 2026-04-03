@@ -29,6 +29,14 @@ function normalizeStreet(str) {
   return s.trim().toLowerCase();
 }
 
+async function getAllHazards() {
+  const response = await fetch('web/data/hazards.json');
+  if (!response.ok) {
+    throw new Error(`Failed to load hazards: ${response.status} ${response.statusText}`);
+  }
+  return await response.json();
+}
+
 async function getHazardsOnRoute(streetSegments) {
   const response = await fetch('web/data/hazards.json');
   if (!response.ok) {

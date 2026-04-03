@@ -26,19 +26,22 @@ function drawRoute(polyline) {
   map.fitBounds(routeLayer.getBounds());
 }
 
-function plotHazards(hazards) {
+function plotHazards(allHazards, routeHazards) {
   for (const marker of hazardMarkers) {
     map.removeLayer(marker);
   }
   hazardMarkers = [];
 
-  for (const hazard of hazards) {
+  const routeIds = new Set(routeHazards.map(h => h.id));
+
+  for (const hazard of allHazards) {
     const date = new Date(hazard.requestDate).toLocaleDateString();
+    const onRoute = routeIds.has(hazard.id);
     const marker = L.circleMarker([hazard.latitude, hazard.longitude], {
-      color: '#e63946',
-      fillColor: '#e63946',
-      fillOpacity: 0.8,
-      radius: 8,
+      color: onRoute ? '#e63946' : '#f4c542',
+      fillColor: onRoute ? '#e63946' : '#f4c542',
+      fillOpacity: onRoute ? 0.8 : 0.6,
+      radius: onRoute ? 8 : 6,
     })
       .bindPopup(
         `<strong>${hazard.location}</strong><br>${hazard.serviceName}<br>${date}`
