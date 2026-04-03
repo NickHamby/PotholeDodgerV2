@@ -99,7 +99,7 @@ function sanitizeInput(str):
 | `"` quote | ❌ | No address meaning |
 | `#` | ❌ | No Nominatim meaning for street addresses |
 | `.` period | ❌ | `"St."` → `"St"` is safe; Nominatim handles both |
-| `&` ampersand | ❌ | Not meaningful to Nominatim; stripped here. Intersection parsing (`"Hull St & W 14th St"`) happens inside `normalizeStreet()` **before** sanitizeInput runs on that string, so this does not affect internal matching. |
+| `&` ampersand | ❌ | Not meaningful to Nominatim; stripped here. Hazard location strings (which use `&` as an intersection separator) **never pass through `sanitizeInput()`** — they come from `hazards.json` and go directly to `normalizeStreet()`. `sanitizeInput()` is only called on user-typed input in the origin/destination fields. Therefore stripping `&` here has no effect on internal hazard matching. |
 | `;` `:` `!` `?` `@` `^` `*` `[` `]` `{` `}` `\|` `\\` `~` `` ` `` `=` `+` `<` `>` `%` `_` | ❌ | No address meaning |
 
 ---
@@ -199,7 +199,7 @@ Add the following transformations **in order**:
 
 3. **Strip trailing ZIP code** must happen before step 2, otherwise `"23220"` at end could interfere with the suffix directional regex.
 
-4. **Address range — house number extraction:** The current code already extracts only the leading number via `/^(\d+)/`, which gives the lower bound of a range. This is acceptable — the `HOUSE_NUMBER_BUFFER` of 100 extends the window. Document this as intended behavior. No change required.
+4. **Address range — house number extraction:** The current code already extracts only the leading number via `/^(\d+)/`, which gives the lower bound of a range. The `HOUSE_NUMBER_BUFFER` of 100 extends the match window. For large ranges (e.g. `"4628-4998"`, a span of 370), the lower bound plus the buffer may leave the upper portion of the range unmatched. **Implementing midpoint extraction (`(lower + upper) / 2`) is deferred as a separate enhancement** — it requires updating both `normalizeStreet()` and `getHazardsOnRoute()` (the caller that extracts `hazardNum` via `/^(\d+)/`). The ready-to-copy `normalizeStreet()` in §11 retains the current lower-bound behavior; see §9 for the known limitation and proposed improvement.
 
 ### Updated `normalizeStreet()` pseudocode
 
@@ -453,9 +453,15 @@ function normalizeStreet(str) {
   }
 
   // 3. Expand directionals at start of string (prefix directional)
+  //    The \s* in the pattern consumes any space that followed the directional letter,
+  //    and the replacement appends one space back, so "W Main St" → "West Main St".
+  //    Any edge-case double-spaces are collapsed by step 7.
   s = s.replace(/^(W|E|N|S)\b\s*/, (_, d) => DIRECTIONAL_EXPAND[d] + ' ');
 
   // 4. Expand directionals at end of string (suffix directional)
+  //    The \s+ in the pattern consumes the space before the directional letter,
+  //    and the replacement prepends one space back, so "Williamsburg Avenue E" → "Williamsburg Avenue East".
+  //    Any edge-case double-spaces are collapsed by step 7.
   s = s.replace(/\s+(W|E|N|S)$/, (_, d) => ' ' + DIRECTIONAL_EXPAND[d]);
 
   // 5. Strip leading house numbers (including fractional like "8 1/2")
