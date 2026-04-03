@@ -14,8 +14,14 @@
     </header>
 
     <div id="controls">
-      <input type="text" id="origin" placeholder="Starting address" />
-      <input type="text" id="destination" placeholder="Destination address" />
+      <div class="input-wrapper">
+        <input type="text" id="origin" placeholder="Starting address" autocomplete="off" />
+        <ul class="autocomplete-list" id="origin-autocomplete"></ul>
+      </div>
+      <div class="input-wrapper">
+        <input type="text" id="destination" placeholder="Destination address" autocomplete="off" />
+        <ul class="autocomplete-list" id="destination-autocomplete"></ul>
+      </div>
       <button id="go-btn">Go</button>
     </div>
 
