@@ -91,12 +91,15 @@ document.addEventListener('DOMContentLoaded', function () {
       const { polyline, streetSegments } = await getRoute(originCoords, destCoords);
 
       setStatus('Loading hazards...');
-      const hazards = await getHazardsOnRoute(streetSegments);
+      const [allHazards, routeHazards] = await Promise.all([
+        getAllHazards(),
+        getHazardsOnRoute(streetSegments)
+      ]);
 
       drawRoute(polyline);
-      plotHazards(hazards);
+      plotHazards(allHazards, routeHazards);
 
-      setStatus(`Route loaded. ${hazards.length} hazard(s) found on route.`);
+      setStatus(`Route loaded. ${routeHazards.length} hazard(s) found on route.`);
     } catch (error) {
       setStatus(`Error: ${error.message}`);
     }
