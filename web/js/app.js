@@ -88,10 +88,10 @@ document.addEventListener('DOMContentLoaded', function () {
       ]);
 
       setStatus('Fetching route...');
-      const { polyline, streetNames } = await getRoute(originCoords, destCoords);
+      const { polyline, streetSegments } = await getRoute(originCoords, destCoords);
 
       setStatus('Loading hazards...');
-      const hazards = await getHazardsOnRoute(streetNames);
+      const hazards = await getHazardsOnRoute(streetSegments);
 
       drawRoute(polyline);
       plotHazards(hazards);
