@@ -65,8 +65,9 @@ async function getRoute(origin, destination) {
     await _routingDelay(NOMINATIM_DELAY_MS);
     const num2 = await _reverseGeocode(coords.last[0], coords.last[1]);
 
-    const minNum = (num1 !== null && num2 !== null) ? Math.min(num1, num2) : FALLBACK_MIN_HOUSE_NUM;
-    const maxNum = (num1 !== null && num2 !== null) ? Math.max(num1, num2) : FALLBACK_MAX_HOUSE_NUM;
+    const resolvedNums = [num1, num2].filter(n => n !== null);
+    const minNum = resolvedNums.length > 0 ? Math.min(...resolvedNums) : FALLBACK_MIN_HOUSE_NUM;
+    const maxNum = resolvedNums.length > 0 ? Math.max(...resolvedNums) : FALLBACK_MAX_HOUSE_NUM;
 
     streetSegments.push({ name, minNum, maxNum });
   }

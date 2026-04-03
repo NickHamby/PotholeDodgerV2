@@ -22,7 +22,7 @@ function attachAutocomplete(inputEl) {
 
     debounceTimer = setTimeout(async function () {
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=0&limit=5&bounded=1&viewbox=-77.6,37.7,-77.2,37.4&q=${encodeURIComponent(query)}`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=0&limit=5&bounded=1&viewbox=-77.6,37.7,-77.2,37.4&countrycodes=us&q=${encodeURIComponent(query)}`;
         const response = await fetch(url, {
           headers: { 'User-Agent': 'PotholeDodger/1.0' }
         });
