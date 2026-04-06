@@ -1,6 +1,6 @@
 // hazards.js — loads hazard data and filters it to streets matching the route
 
-const STREET_TYPE_ABBRS = [
+const ABBR_MAP = [
   [/\bSt\b/g, 'Street'],
   [/\bAve\b/g, 'Avenue'],
   [/\bBlvd\b/g, 'Boulevard'],
@@ -9,40 +9,21 @@ const STREET_TYPE_ABBRS = [
   [/\bPkwy\b/g, 'Parkway'],
   [/\bLn\b/g, 'Lane'],
   [/\bCt\b/g, 'Court'],
+  [/\bW\b/g, 'West'],
+  [/\bE\b/g, 'East'],
+  [/\bN\b/g, 'North'],
+  [/\bS\b/g, 'South'],
 ];
-
-const DIRECTIONAL_EXPAND = {
-  W: 'West',
-  E: 'East',
-  N: 'North',
-  S: 'South',
-};
 
 function normalizeStreet(str) {
   let s = str;
-
-  // 1. Strip trailing ZIP code (5 digits, optionally preceded by comma and/or space)
-  s = s.replace(/[,\s]+\d{5}\s*$/, '');
-
-  // 2. Expand street type abbreviations
-  for (const [pattern, replacement] of STREET_TYPE_ABBRS) {
+  for (const [pattern, replacement] of ABBR_MAP) {
     s = s.replace(pattern, replacement);
   }
-
-  // 3. Expand directionals at start of string (prefix directional)
-  s = s.replace(/^(W|E|N|S)\b\s*/, (_, d) => DIRECTIONAL_EXPAND[d] + ' ');
-
-  // 4. Expand directionals at end of string (suffix directional)
-  s = s.replace(/\s+(W|E|N|S)$/, (_, d) => ' ' + DIRECTIONAL_EXPAND[d]);
-
-  // 5. Strip leading house numbers (including fractional like "8 1/2")
+  // Strip leading house numbers (including fractional like "8 1/2") but preserve
+  // street numbers that are part of the name (e.g. "1st Avenue")
   s = s.replace(/^\d+(\s+\d+\/\d+)?\s+/, '');
-
-  // 6. Strip remaining punctuation
   s = s.replace(/[^a-zA-Z0-9\s]/g, '');
-
-  // 7. Collapse whitespace and trim, lowercase
-  s = s.replace(/\s{2,}/g, ' ');
   return s.trim().toLowerCase();
 }
 
