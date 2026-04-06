@@ -13,7 +13,7 @@ function attachAutocomplete(inputEl) {
 
   inputEl.addEventListener('input', function () {
     clearTimeout(debounceTimer);
-    const query = inputEl.value.trim();
+    const query = sanitizeInput(inputEl.value);
 
     if (query.length < 3) {
       hideList();
@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   async function run() {
-    const origin = document.getElementById('origin').value.trim();
-    const destination = document.getElementById('destination').value.trim();
+    const origin = sanitizeInput(document.getElementById('origin').value);
+    const destination = sanitizeInput(document.getElementById('destination').value);
 
     if (!origin || !destination) {
       setStatus('Please enter both an origin and destination.');
