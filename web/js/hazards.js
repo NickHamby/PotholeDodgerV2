@@ -15,8 +15,6 @@ const ABBR_MAP = [
   [/\bS\b/g, 'South'],
 ];
 
-const HOUSE_NUMBER_BUFFER = 100;
-
 function normalizeStreet(str) {
   let s = str;
   for (const [pattern, replacement] of ABBR_MAP) {
@@ -45,26 +43,38 @@ async function getHazardsOnRoute(streetSegments) {
   const hazards = await response.json();
 
   const normalizedSegments = streetSegments.map(seg => ({
-    name: normalizeStreet(seg.name),
-    minNum: seg.minNum,
-    maxNum: seg.maxNum
+    name:   normalizeStreet(seg.name),
+    minLat: seg.minLat,
+    maxLat: seg.maxLat,
+    minLng: seg.minLng,
+    maxLng: seg.maxLng,
   }));
 
   console.log('[hazards] normalized route street segments:', normalizedSegments);
 
   return hazards.filter(hazard => {
-    const houseNumMatch = hazard.location.match(/^(\d+)/);
-    const hazardNum = houseNumMatch ? parseInt(houseNumMatch[1], 10) : null;
+    // Guard: skip malformed coordinates
+    if (hazard.latitude == null || hazard.longitude == null) return false;
+
     const tokens = hazard.location.split('&').map(normalizeStreet);
+
     const matched = tokens.some(token =>
       normalizedSegments.some(seg => {
+        // Part 1: street name must match
         const nameMatch = seg.name.includes(token) || token.includes(seg.name);
         if (!nameMatch) return false;
-        if (hazardNum === null) return true;
-        return hazardNum >= seg.minNum - HOUSE_NUMBER_BUFFER && hazardNum <= seg.maxNum + HOUSE_NUMBER_BUFFER;
+
+        // Part 2: coordinates must fall within bounding box
+        return (
+          hazard.latitude  >= seg.minLat &&
+          hazard.latitude  <= seg.maxLat &&
+          hazard.longitude >= seg.minLng &&
+          hazard.longitude <= seg.maxLng
+        );
       })
     );
-    console.log(`[hazards] "${hazard.location}" → tokens: ${JSON.stringify(tokens)} → ${matched ? 'INCLUDED' : 'excluded'}`);
+
+    console.log(`[hazards] "${hazard.location}" → ${matched ? 'INCLUDED' : 'excluded'}`);
     return matched;
   });
 }
